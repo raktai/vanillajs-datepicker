@@ -4,7 +4,7 @@ import rootDir from './lib/rootDir.js';
 const srcDir = `${rootDir}/js/i18n/locales`;
 const distDir = `${rootDir}/dist/js/locales`;
 
-const reConvert = /export default (\{\s+)([\w'-]+):([\s\S]+\})\n\};/m;
+const reConvert = /export default (\{\s+)([\w'-]+):([\s\S]+\})\r?\n\};/m;
 const rePropNameFix = /\.('\w+-\w+')/;
 
 if (fs.existsSync(distDir)) {
