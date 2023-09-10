@@ -1,3 +1,5 @@
+เพิ่ม format 'b' เพื่อแสดงผลเป็นปี พ.ศ. 
+
 # Vanilla JS Datepicker
 
 A vanilla JavaScript remake of [bootstrap-datepicker](https://github.com/uxsolutions/bootstrap-datepicker) for [Bulma](https://bulma.io) and other CSS frameworks  
