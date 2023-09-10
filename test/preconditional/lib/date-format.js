@@ -214,7 +214,7 @@ describe('lib/date', function () {
     it('throws an Error if format is neither a valid format string nor an object w/ toValue property', function () {
       expect(() => parseDate('01-01-01', {}), 'to throw error');
       expect(() => parseDate('01-01-01', 1), 'to throw error');
-      expect(() => parseDate('01-01-01', 'aa-bb-cc'), 'to throw error');
+      expect(() => parseDate('01-01-01', 'aa-zz-cc'), 'to throw error');
     });
   });
 
@@ -304,7 +304,7 @@ describe('lib/date', function () {
       const date = new Date(2012, 2, 5);
       expect(() => formatDate(date, {}), 'to throw error');
       expect(() => formatDate(date, 1), 'to throw error');
-      expect(() => formatDate(date, 'aa-bb-cc'), 'to throw error');
+      expect(() => formatDate(date, 'aa-zz-cc'), 'to throw error');
     });
   });
 });

@@ -25,11 +25,14 @@ export default class YearsView extends View {
   }
 
   setOptions(options) {
+    if (options.locale) {
+      this.yearOffset = options.locale.yearOffset || 0;
+    }
     if ('minDate' in options) {
       if (options.minDate === undefined) {
         this.minYear = this.minDate = undefined;
       } else {
-        this.minYear = startOfYearPeriod(options.minDate, this.step);
+        this.minYear = startOfYearPeriod(options.minDate, this.step, this.yearOffset);
         this.minDate = dateValue(this.minYear, 0, 1);
       }
     }
@@ -37,7 +40,7 @@ export default class YearsView extends View {
       if (options.maxDate === undefined) {
         this.maxYear = this.maxDate = undefined;
       } else {
-        this.maxYear = startOfYearPeriod(options.maxDate, this.step);
+        this.maxYear = startOfYearPeriod(options.maxDate, this.step, this.yearOffset);
         this.maxDate = dateValue(this.maxYear, 11, 31);
       }
     }
@@ -55,25 +58,25 @@ export default class YearsView extends View {
   // Update view's settings to reflect the viewDate set on the picker
   updateFocus() {
     const viewDate = new Date(this.picker.viewDate);
-    const first = startOfYearPeriod(viewDate, this.navStep);
+    const first = startOfYearPeriod(viewDate, this.navStep, this.yearOffset);
     const last = first + 9 * this.step;
 
     this.first = first;
     this.last = last;
     this.start = first - this.step;
-    this.focused = startOfYearPeriod(viewDate, this.step);
+    this.focused = startOfYearPeriod(viewDate, this.step, this.yearOffset);
   }
 
   // Update view's settings to reflect the selected dates
   updateSelection() {
     const {dates, rangepicker} = this.picker.datepicker;
     this.selected = dates.reduce((years, timeValue) => {
-      return pushUnique(years, startOfYearPeriod(timeValue, this.step));
+      return pushUnique(years, startOfYearPeriod(timeValue, this.step, this.yearOffset));
     }, []);
     if (rangepicker && rangepicker.dates) {
       this.range = rangepicker.dates.map(timeValue => {
         if (timeValue !== undefined) {
-          return startOfYearPeriod(timeValue, this.step);
+          return startOfYearPeriod(timeValue, this.step, this.yearOffset);
         }
       });
     }
@@ -82,7 +85,7 @@ export default class YearsView extends View {
   // Update the entire view UI
   render() {
     this.prepareForRender(
-      `${this.first}-${this.last}`,
+      `${this.first+this.yearOffset}-${this.last+this.yearOffset}`,
       this.first <= this.minYear,
       this.last >= this.maxYear
     );
@@ -94,7 +97,7 @@ export default class YearsView extends View {
       el.dataset.year = current;
       this.renderCell(
         el,
-        current,
+        current + this.yearOffset,
         current,
         date,
         this,

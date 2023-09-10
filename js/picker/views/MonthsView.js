@@ -41,6 +41,7 @@ export default class MonthsView extends View {
   setOptions(options) {
     if (options.locale) {
       this.monthNames = options.locale.monthsShort;
+      this.yearOffset = options.locale.yearOffset || 0;
     }
     if ('minDate' in options) {
       if (options.minDate === undefined) {
@@ -106,7 +107,7 @@ export default class MonthsView extends View {
   // Update the entire view UI
   render() {
     this.prepareForRender(
-      this.year,
+      this.year + this.yearOffset,
       this.year <= this.minYear,
       this.year >= this.maxYear
     );

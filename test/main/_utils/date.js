@@ -116,10 +116,10 @@ var dateUtils = (function (exports) {
 
   // Get the start year of the period of years that includes given date
   // years: length of the year period
-  function startOfYearPeriod(date, years) {
+  function startOfYearPeriod(date, years, offset = 0) {
     /* @see https://en.wikipedia.org/wiki/Year_zero#ISO_8601 */
     const year = new Date(date).getFullYear();
-    return Math.floor(year / years) * years;
+    return Math.floor((year + offset) / years) * years - offset;
   }
 
   // Convert date to the first/last date of the month/year of the date

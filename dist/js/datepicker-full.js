@@ -174,10 +174,10 @@
 
   // Get the start year of the period of years that includes given date
   // years: length of the year period
-  function startOfYearPeriod(date, years) {
+  function startOfYearPeriod(date, years, offset = 0) {
     /* @see https://en.wikipedia.org/wiki/Year_zero#ISO_8601 */
     const year = new Date(date).getFullYear();
-    return Math.floor(year / years) * years;
+    return Math.floor((year + offset) / years) * years - offset;
   }
 
   // Convert date to the first/last date of the month/year of the date
@@ -199,13 +199,16 @@
   }
 
   // pattern for format parts
-  const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?/;
+  const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?|bb?(?:bb)?/;
   // pattern for non date parts
   const reNonDateParts = /[\s!-/:-@[-`{-~年月日]+/;
   // cache for persed formats
   let knownFormats = {};
   // parse funtions for date parts
   const parseFns = {
+    b(date, year) {
+      return new Date(date).setFullYear(parseInt(year, 10) - 543);
+    },
     y(date, year) {
       return new Date(date).setFullYear(parseInt(year, 10));
     },
@@ -274,6 +277,15 @@
     },
     yyyy(date) {
       return padZero(date.getFullYear(), 4);
+    },
+    b(date) {
+      return date.getFullYear() + 543;
+    },
+    bb(date) {
+      return padZero(date.getFullYear() + 543, 2).slice(-2);
+    },
+    bbbb(date) {
+      return padZero(date.getFullYear() + 543, 4);
     },
   };
 
@@ -1344,6 +1356,7 @@
     setOptions(options) {
       if (options.locale) {
         this.monthNames = options.locale.monthsShort;
+        this.yearOffset = options.locale.yearOffset || 0;
       }
       if ('minDate' in options) {
         if (options.minDate === undefined) {
@@ -1409,7 +1422,7 @@
     // Update the entire view UI
     render() {
       this.prepareForRender(
-        this.year,
+        this.year + this.yearOffset,
         this.year <= this.minYear,
         this.year >= this.maxYear
       );
@@ -1473,11 +1486,14 @@
     }
 
     setOptions(options) {
+      if (options.locale) {
+        this.yearOffset = options.locale.yearOffset || 0;
+      }
       if ('minDate' in options) {
         if (options.minDate === undefined) {
           this.minYear = this.minDate = undefined;
         } else {
-          this.minYear = startOfYearPeriod(options.minDate, this.step);
+          this.minYear = startOfYearPeriod(options.minDate, this.step, this.yearOffset);
           this.minDate = dateValue(this.minYear, 0, 1);
         }
       }
@@ -1485,7 +1501,7 @@
         if (options.maxDate === undefined) {
           this.maxYear = this.maxDate = undefined;
         } else {
-          this.maxYear = startOfYearPeriod(options.maxDate, this.step);
+          this.maxYear = startOfYearPeriod(options.maxDate, this.step, this.yearOffset);
           this.maxDate = dateValue(this.maxYear, 11, 31);
         }
       }
@@ -1503,25 +1519,25 @@
     // Update view's settings to reflect the viewDate set on the picker
     updateFocus() {
       const viewDate = new Date(this.picker.viewDate);
-      const first = startOfYearPeriod(viewDate, this.navStep);
+      const first = startOfYearPeriod(viewDate, this.navStep, this.yearOffset);
       const last = first + 9 * this.step;
 
       this.first = first;
       this.last = last;
       this.start = first - this.step;
-      this.focused = startOfYearPeriod(viewDate, this.step);
+      this.focused = startOfYearPeriod(viewDate, this.step, this.yearOffset);
     }
 
     // Update view's settings to reflect the selected dates
     updateSelection() {
       const {dates, rangepicker} = this.picker.datepicker;
       this.selected = dates.reduce((years, timeValue) => {
-        return pushUnique(years, startOfYearPeriod(timeValue, this.step));
+        return pushUnique(years, startOfYearPeriod(timeValue, this.step, this.yearOffset));
       }, []);
       if (rangepicker && rangepicker.dates) {
         this.range = rangepicker.dates.map(timeValue => {
           if (timeValue !== undefined) {
-            return startOfYearPeriod(timeValue, this.step);
+            return startOfYearPeriod(timeValue, this.step, this.yearOffset);
           }
         });
       }
@@ -1530,7 +1546,7 @@
     // Update the entire view UI
     render() {
       this.prepareForRender(
-        `${this.first}-${this.last}`,
+        `${this.first+this.yearOffset}-${this.last+this.yearOffset}`,
         this.first <= this.minYear,
         this.last >= this.maxYear
       );
@@ -1542,7 +1558,7 @@
         el.dataset.year = current;
         this.renderCell(
           el,
-          current,
+          current + this.yearOffset,
           current,
           date,
           this,

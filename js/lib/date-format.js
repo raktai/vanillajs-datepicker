@@ -2,13 +2,16 @@ import {stripTime, today} from './date.js';
 import {lastItemOf} from './utils.js';
 
 // pattern for format parts
-export const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?/;
+export const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?|bb?(?:bb)?/;
 // pattern for non date parts
 export const reNonDateParts = /[\s!-/:-@[-`{-~年月日]+/;
 // cache for persed formats
 let knownFormats = {};
 // parse funtions for date parts
 const parseFns = {
+  b(date, year) {
+    return new Date(date).setFullYear(parseInt(year, 10) - 543);
+  },
   y(date, year) {
     return new Date(date).setFullYear(parseInt(year, 10));
   },
@@ -77,6 +80,15 @@ const formatFns = {
   },
   yyyy(date) {
     return padZero(date.getFullYear(), 4);
+  },
+  b(date) {
+    return date.getFullYear() + 543;
+  },
+  bb(date) {
+    return padZero(date.getFullYear() + 543, 2).slice(-2);
+  },
+  bbbb(date) {
+    return padZero(date.getFullYear() + 543, 4);
   },
 };
 

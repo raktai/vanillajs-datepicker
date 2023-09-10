@@ -213,6 +213,7 @@ const languages = {
   ta: 'Tamil',
   tg: 'Tajik',
   th: 'Thai',
+  'th-TH': 'Thai Buddhist era',
   tk: 'Turkmen',
   tr: 'Turkish',
   uk: 'Ukrainian',
